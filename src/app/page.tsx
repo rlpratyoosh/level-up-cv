@@ -64,6 +64,39 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-24 gap-10 min-w-screen">
+      <motion.div 
+        className="absolute top-10 left-10 flex items-center justify-center gap-2 text-black bg-amber-400 pt-1 pb-1 pl-2 pr-2 rounded-lg text-xs shadow-[0_0_20px_rgba(251,191,36,0.8)]"
+        animate={{ y: [0, -10, 0] }}
+        transition={{ 
+          duration: 2, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+      >
+        <FaTrophy /> BETA
+      </motion.div>
+      <motion.div 
+        className="absolute top-52 right-10 flex items-center justify-center gap-2 text-white font-bold bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-full text-xl border-2 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+        animate={{ y: [0, -10, 0] }}
+        transition={{ 
+          duration: 2, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+      >
+        15
+      </motion.div>
+      <motion.div 
+        className="absolute top-200 left-20 hidden sm:flex items-center justify-center gap-2 text-black bg-amber-400 pt-1 pb-1 pl-2 pr-2 rounded-lg text-xs shadow-[0_0_20px_rgba(251,191,36,0.8)]"
+        animate={{ y: [0, -10, 0] }}
+        transition={{ 
+          duration: 2, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+      >
+        <FaCode /> CODE
+      </motion.div>
       <div className="min-w-screen flex flex-col gap-4 text-center items-center justify-center">
         <h1 className="text-7xl md:text-8xl font-extrabold pl-10 pr-10">
           <span className="text-blue-500 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">
@@ -157,91 +190,7 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Footer */}
-      <footer className="min-w-screen border-t mt-20 px-4 md:px-8 py-12 md:py-16 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 md:mb-12">
-            {/* Logo and Description */}
-            <div className="col-span-1 sm:col-span-2 lg:col-span-1">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                  <PiLightningBold className="text-white text-lg md:text-xl" />
-                </div>
-                <span className="text-blue-500 text-lg md:text-xl font-bold">LevelUp CV</span>
-              </div>
-              <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-6 max-w-xs">
-                Transform your resume into an epic RPG character sheet. Level up your career with XP, badges, and achievements.
-              </p>
-              <div className="flex gap-3 md:gap-4">
-                <div className="w-7 h-7 md:w-8 md:h-8 bg-gray-800 rounded flex items-center justify-center hover:bg-blue-500 transition-colors cursor-pointer">
-                  <span className="text-gray-400 hover:text-white text-xs md:text-sm">𝕏</span>
-                </div>
-                <div className="w-7 h-7 md:w-8 md:h-8 bg-gray-800 rounded flex items-center justify-center hover:bg-blue-500 transition-colors cursor-pointer">
-                  <span className="text-gray-400 hover:text-white text-xs md:text-sm">⚡</span>
-                </div>
-                <div className="w-7 h-7 md:w-8 md:h-8 bg-gray-800 rounded flex items-center justify-center hover:bg-blue-500 transition-colors cursor-pointer">
-                  <span className="text-gray-400 hover:text-white text-xs md:text-sm">in</span>
-                </div>
-                <div className="w-7 h-7 md:w-8 md:h-8 bg-gray-800 rounded flex items-center justify-center hover:bg-blue-500 transition-colors cursor-pointer">
-                  <span className="text-gray-400 hover:text-white text-xs md:text-sm">✉</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Product */}
-            <div>
-              <h3 className="text-white font-semibold mb-3 md:mb-4 text-sm md:text-base">Product</h3>
-              <ul className="space-y-2 md:space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Features</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Pricing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Templates</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Integrations</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">API</a></li>
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div>
-              <h3 className="text-white font-semibold mb-3 md:mb-4 text-sm md:text-base">Resources</h3>
-              <ul className="space-y-2 md:space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">🛟 Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Community</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Career Tips</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Resume Examples</a></li>
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <h3 className="text-white font-semibold mb-3 md:mb-4 text-sm md:text-base">Company</h3>
-              <ul className="space-y-2 md:space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">About</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Careers</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">Contact</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">🔒 Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-blue-500 transition-colors text-xs md:text-sm">📄 Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="border-t border-gray-800 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-gray-400 text-xs md:text-sm text-center md:text-left">
-              © 2024 LevelUp CV. All rights reserved. Made with <span className="text-red-500">❤</span> for developers.
-            </div>
-            <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
-              <div className="flex items-center gap-2 text-gray-400 text-xs md:text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>50K+ developers leveled up</span>
-              </div>
-              <div className="bg-yellow-500 text-black px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-semibold">
-                ⚡ Live
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      
     </main>
   );
 }
