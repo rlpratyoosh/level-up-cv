@@ -8,141 +8,150 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id             String            @id @default(cuid())
-  email          String            @unique
-  userName       String
-  profile        Profile?
-  resumes        Resume[]
-  skills         Skill[]
-  projects       Project[]
-  experiences    Experience[]
-  educations     Education[]
-  certifications Certification[]
-  achievements   UserAchievement[]
-  totalXp        Int               @default(0)
+model profile {
+  id             String            @id
+  fullname       String?
+  bio            String?
+  avatarurl      String?
+  title          String?
+  totalxp        Int               @default(0)
   level          Int               @default(1)
-  activity       String[]
-  createdAt      DateTime          @default(now())
+  resumes        resume[]
+  skills         skill[]
+  projects       project[]
+  experiences    experience[]
+  educations     education[]
+  certifications certification[]
+  achievements   userAchievement[]
+  activities     activity[]
+  createdat      DateTime          @default(now())
 }
 
-model Profile {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  fullName  String
-  bio       String?
-  avatarUrl String?
-  title     String?
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-}
 
-model Resume {
+model resume {
   id          String   @id @default(cuid())
-  userId      String
+  profileid   String
   title       String
-  includedIds Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id])
+  includedids Json?
+  createdat   DateTime @default(now())
+  updatedat   DateTime @updatedAt
+  profile     profile  @relation(fields: [profileid], references: [id])
 }
 
-model Skill {
+model skill {
   id          String             @id @default(cuid())
-  userId      String
+  profileid   String
   name        String
-  totalXp     Int                @default(0)
+  totalxp     Int                @default(0)
   level       Int                @default(1)
   title       String?
-  projects    ProjectSkills[]
-  experiences ExperienceSkills[]
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  user        User               @relation(fields: [userId], references: [id])
+  projects    projectskills[]
+  experiences experienceskills[]
+  createdat   DateTime           @default(now())
+  updatedat   DateTime           @updatedAt
+  profile     profile            @relation(fields: [profileid], references: [id])
 }
 
-model Project {
+model project {
   id          String          @id @default(cuid())
-  userId      String
+  profileid   String
   title       String
   description String?
   link        String?
-  skills      ProjectSkills[]
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  user        User            @relation(fields: [userId], references: [id])
+  skills      projectskills[]
+  startdate   DateTime?
+  enddate     DateTime?
+  createdat   DateTime        @default(now())
+  updatedat   DateTime        @updatedAt
+  profile     profile         @relation(fields: [profileid], references: [id])
 }
 
-model ProjectSkills {
+model projectskills {
   id        String  @id @default(cuid())
-  projectId String
-  skillId   String
-  project   Project @relation(fields: [projectId], references: [id])
-  skill     Skill   @relation(fields: [skillId], references: [id])
+  projectid String
+  skillid   String
+  project   project @relation(fields: [projectid], references: [id])
+  skill     skill   @relation(fields: [skillid], references: [id])
 }
 
-model Experience {
+model experience {
   id        String             @id @default(cuid())
-  userId    String
+  profileid String
   role      String
   company   String
   summary   String?
-  startDate DateTime?
-  endDate   DateTime?
-  skills    ExperienceSkills[]
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
-  user      User               @relation(fields: [userId], references: [id])
+  startdate DateTime?
+  enddate   DateTime?
+  skills    experienceskills[]
+  createdat DateTime           @default(now())
+  updatedat DateTime           @updatedAt
+  profile   profile            @relation(fields: [profileid], references: [id])
 }
 
-model ExperienceSkills {
+model experienceskills {
   id           String     @id @default(cuid())
-  experienceId String
-  skillId      String
-  experience   Experience @relation(fields: [experienceId], references: [id])
-  skill        Skill      @relation(fields: [skillId], references: [id])
+  experienceid String
+  skillid      String
+  experience   experience @relation(fields: [experienceid], references: [id])
+  skill        skill      @relation(fields: [skillid], references: [id])
 }
 
-model Education {
+model education {
   id          String    @id @default(cuid())
-  userId      String
+  profileid   String
   institution String
   degree      String
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  user        User      @relation(fields: [userId], references: [id])
+  startdate   DateTime?
+  enddate     DateTime?
+  createdat   DateTime  @default(now())
+  updatedat   DateTime  @updatedAt
+  profile     profile   @relation(fields: [profileid], references: [id])
 }
 
-model Certification {
+model certification {
   id             String    @id @default(cuid())
-  userId         String
+  profileid      String
   title          String
   issuer         String
-  issueDate      DateTime?
-  expirationDate DateTime?
+  issuedate      DateTime?
+  expirationdate DateTime?
   link           String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  user           User      @relation(fields: [userId], references: [id])
+  createdat      DateTime  @default(now())
+  updatedat      DateTime  @updatedAt
+  profile        profile   @relation(fields: [profileid], references: [id])
 }
 
-model Achievement {
+model achievement {
   id               String            @id @default(cuid())
   title            String
   description      String?
-  userAchievements UserAchievement[]
-  createdAt        DateTime          @default(now())
+  userachievements userAchievement[]
+  createdat        DateTime          @default(now())
 }
 
-model UserAchievement {
-  id            String       @id @default(cuid())
-  userId        String
-  achievementId String
-  user          User         @relation(fields: [userId], references: [id])
-  achievement   Achievement @relation(fields: [achievementId], references: [id])
-  createdAt     DateTime     @default(now())
+model userAchievement {
+  id            String      @id @default(cuid())
+  profileid     String
+  achievementid String
+  profile       profile     @relation(fields: [profileid], references: [id])
+  achievement   achievement @relation(fields: [achievementid], references: [id])
+  createdat     DateTime    @default(now())
+}
+
+model activity {
+  id        String       @id @default(cuid())
+  profileid String
+  type      activitytype
+  details   String
+  createdat DateTime     @default(now())
+  profile   profile      @relation(fields: [profileid], references: [id])
+}
+
+enum activitytype {
+  SKILL
+  PROJECT
+  EXPERIENCE
+  EDUCATION
+  CERTIFICATION
+  ACHIEVEMENT
 }
