@@ -8,10 +8,34 @@ import { FaBullseye } from "react-icons/fa6";
 import { FaCode } from "react-icons/fa6";
 import { FiDownload } from "react-icons/fi";
 import { IoIosGitBranch } from "react-icons/io";
+import { FaGithub, FaLinkedin, FaTwitter, FaHeart } from "react-icons/fa";
 import { motion } from "framer-motion";
 import LoginDialog from "@/components/Login";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [particles, setParticles] = useState<Array<{left: string, top: string}>>([]);
+  const [footerSparkles, setFooterSparkles] = useState<Array<{left: string, top: string}>>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    // Generate particles for background
+    const newParticles = [...Array(15)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+    }));
+    setParticles(newParticles);
+
+    // Generate sparkles for footer
+    const newSparkles = [...Array(6)].map(() => ({
+      left: `${20 + Math.random() * 60}%`,
+      top: `${20 + Math.random() * 60}%`,
+    }));
+    setFooterSparkles(newSparkles);
+  }, []);
+
   const cards = [
     {
       icon: <FaRegChartBar />,
@@ -102,10 +126,149 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-24 gap-10 min-w-screen overflow-hidden">
+    <main className="flex min-h-screen flex-col items-center justify-start p-24 gap-10 min-w-screen overflow-hidden relative">
+      {/* Enhanced Background Animations */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Animated gradient orbs */}
+        <motion.div
+          className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl"
+          animate={{
+            x: [0, 100, -50, 0],
+            y: [0, -50, 100, 0],
+            scale: [1, 1.2, 0.8, 1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -right-40 w-96 h-96 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-full blur-3xl"
+          animate={{
+            x: [0, -100, 50, 0],
+            y: [0, 50, -100, 0],
+            scale: [1, 0.8, 1.3, 1],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-r from-purple-500/15 to-pink-500/15 rounded-full blur-3xl"
+          animate={{
+            x: [0, 150, -75, 0],
+            y: [0, -100, 150, 0],
+            scale: [1, 1.1, 0.9, 1],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 5
+          }}
+        />
+
+        {/* Floating particles */}
+        {isClient && particles.map((particle, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-blue-400/30 rounded-full"
+            style={{
+              left: particle.left,
+              top: particle.top,
+            }}
+            animate={{
+              y: [-20, 20, -20],
+              x: [-15, 15, -15],
+              opacity: [0.3, 0.8, 0.3],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 8 + Math.random() * 4,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+
+        {/* Geometric shapes */}
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-4 h-4 border-2 border-blue-400/40 rotate-45"
+          animate={{
+            rotate: [45, 405, 45],
+            scale: [1, 1.5, 1],
+            opacity: [0.4, 0.8, 0.4],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-1/3 left-1/3 w-6 h-6 border-2 border-purple-400/40 rounded-full"
+          animate={{
+            scale: [1, 1.8, 1],
+            opacity: [0.3, 0.7, 0.3],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 3
+          }}
+        />
+        <motion.div
+          className="absolute top-3/4 right-1/6 w-3 h-12 bg-gradient-to-b from-green-400/30 to-transparent rounded-full"
+          animate={{
+            scaleY: [1, 1.5, 0.5, 1],
+            opacity: [0.3, 0.6, 0.3],
+            rotate: [0, 45, -45, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+
+        {/* Pulsing rings */}
+        <motion.div
+          className="absolute top-1/6 left-1/2 w-32 h-32 border border-blue-400/20 rounded-full"
+          animate={{
+            scale: [1, 2, 1],
+            opacity: [0.5, 0, 0.5],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 right-1/3 w-24 h-24 border border-purple-400/20 rounded-full"
+          animate={{
+            scale: [1, 2.5, 1],
+            opacity: [0.4, 0, 0.4],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeOut",
+            delay: 2
+          }}
+        />
+      </div>
       {/* Floating Badges */}
       <motion.div
-        className="absolute top-10 left-10 flex items-center justify-center gap-2 text-black bg-amber-400 pt-1 pb-1 pl-2 pr-2 rounded-lg text-xs shadow-[0_0_20px_rgba(251,191,36,0.8)]"
+        className="absolute top-10 left-10 flex items-center justify-center gap-2 text-black bg-amber-400 pt-1 pb-1 pl-2 pr-2 rounded-lg text-xs shadow-[0_0_20px_rgba(251,191,36,0.8)] z-20"
         initial={{ opacity: 0, x: -100 }}
         animate={{ 
           opacity: 1, 
@@ -126,7 +289,7 @@ export default function Home() {
       </motion.div>
 
       <motion.div
-        className="absolute top-52 right-10 flex items-center justify-center gap-2 text-white font-bold bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-full text-xl border-2 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+        className="absolute top-52 right-10 flex items-center justify-center gap-2 text-white font-bold bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-full text-xl border-2 shadow-[0_0_10px_rgba(59,130,246,0.5)] z-20"
         initial={{ opacity: 0, x: 100, rotate: 180 }}
         animate={{ 
           opacity: 1, 
@@ -149,7 +312,7 @@ export default function Home() {
       </motion.div>
 
       <motion.div
-        className="absolute top-200 left-20 hidden sm:flex items-center justify-center gap-2 text-black bg-amber-400 pt-1 pb-1 pl-2 pr-2 rounded-lg text-xs shadow-[0_0_20px_rgba(251,191,36,0.8)]"
+        className="absolute top-200 left-20 hidden sm:flex items-center justify-center gap-2 text-black bg-amber-400 pt-1 pb-1 pl-2 pr-2 rounded-lg text-xs shadow-[0_0_20px_rgba(251,191,36,0.8)] z-20"
         initial={{ opacity: 0, scale: 0 }}
         animate={{ 
           opacity: 1, 
@@ -170,7 +333,7 @@ export default function Home() {
       </motion.div>
 
       <motion.div 
-        className="min-w-screen flex flex-col gap-4 text-center items-center justify-center"
+        className="min-w-screen flex flex-col gap-4 text-center items-center justify-center relative z-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -279,7 +442,7 @@ export default function Home() {
             whileTap={{ scale: 0.99 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
-            Dashboard 
+            <Link href="/dashboard">Dashboard</Link>
             <motion.div
               animate={{ x: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
@@ -451,6 +614,209 @@ export default function Home() {
             Join thousands of developers who've already leveled up their careers
           </motion.p>
         </motion.div>
+
+        {/* Beautiful Footer */}
+        <motion.footer 
+          className="w-full max-w-4xl mt-32 mb-10"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          {/* Footer Content */}
+          <motion.div 
+            className="relative bg-gradient-to-br from-blue-50/80 to-purple-50/80 dark:from-gray-800/50 dark:to-gray-900/50 rounded-3xl p-8 md:p-12 border border-blue-100/50 dark:border-gray-700/50 backdrop-blur-sm shadow-2xl"
+            whileHover={{ 
+              scale: 1.01,
+              boxShadow: "0 25px 50px rgba(0,0,0,0.1)"
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Background decoration */}
+            <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+              <motion.div
+                className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.1, 0.2, 0.1],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <motion.div
+                className="absolute -bottom-20 -left-20 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.1, 0.15, 0.1],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }}
+              />
+            </div>
+
+            <div className="relative z-10 text-center space-y-6">
+              {/* Project Name */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+              >
+                <motion.h3 
+                  className="text-3xl md:text-4xl font-bold mb-2"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.span 
+                    className="text-blue-500 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                    animate={{ 
+                      textShadow: [
+                        "0 0 10px rgba(59,130,246,0.5)",
+                        "0 0 20px rgba(59,130,246,0.8)",
+                        "0 0 10px rgba(59,130,246,0.5)"
+                      ]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    Level Up CV
+                  </motion.span>
+                </motion.h3>
+              </motion.div>
+
+              {/* Made with love message */}
+              <motion.div 
+                className="flex items-center justify-center gap-2 text-lg md:text-xl text-gray-700 dark:text-gray-300"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+              >
+                <span>Made with</span>
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ 
+                    duration: 1.5, 
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <FaHeart className="text-red-500 text-xl" />
+                </motion.div>
+                <span>by</span>
+                <motion.span 
+                  className="font-bold text-blue-600 dark:text-blue-400"
+                  whileHover={{ 
+                    scale: 1.1,
+                    color: "#3b82f6"
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Pratyoosh
+                </motion.span>
+              </motion.div>
+
+              {/* Social Links */}
+              <motion.div 
+                className="flex items-center justify-center gap-6 pt-4"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+              >
+                <motion.a
+                  href="https://github.com/rlpratyoosh"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative p-3 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                  whileHover={{ 
+                    scale: 1.1,
+                    y: -5,
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <FaGithub className="text-2xl text-gray-700 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white transition-colors duration-300" />
+                  <motion.div
+                    className="absolute -inset-1 bg-gradient-to-r from-gray-600 to-gray-800 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                    initial={false}
+                  />
+                </motion.a>
+                
+                <motion.a
+                  href="https://linkedin.com/in/pratyoosh"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative p-3 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                  whileHover={{ 
+                    scale: 1.1,
+                    y: -5,
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <FaLinkedin className="text-2xl text-blue-600 group-hover:text-blue-700 transition-colors duration-300" />
+                  <motion.div
+                    className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                    initial={false}
+                  />
+                </motion.a>
+                
+                <motion.a
+                  href="https://twitter.com/pratyoosh"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative p-3 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                  whileHover={{ 
+                    scale: 1.1,
+                    y: -5,
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <FaTwitter className="text-2xl text-sky-500 group-hover:text-sky-600 transition-colors duration-300" />
+                  <motion.div
+                    className="absolute -inset-1 bg-gradient-to-r from-sky-500 to-sky-700 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                    initial={false}
+                  />
+                </motion.a>
+              </motion.div>
+
+              {/* Floating sparkles around footer */}
+              {isClient && footerSparkles.map((sparkle, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-blue-400/40 rounded-full"
+                  style={{
+                    left: sparkle.left,
+                    top: sparkle.top,
+                  }}
+                  animate={{
+                    y: [-10, 10, -10],
+                    x: [-5, 5, -5],
+                    opacity: [0.4, 0.8, 0.4],
+                    scale: [1, 1.5, 1],
+                  }}
+                  transition={{
+                    duration: 3 + Math.random() * 2,
+                    repeat: Infinity,
+                    delay: Math.random() * 2,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </motion.footer>
       </motion.div>
     </main>
   );
