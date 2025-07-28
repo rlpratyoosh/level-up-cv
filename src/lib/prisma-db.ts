@@ -1,7 +1,19 @@
 import { prisma } from "./prisma";
+import type { 
+  Profile,
+  ProfileUpdate,
+  SkillUpdate,
+  ResumeUpdate,
+  ProjectUpdate,
+  ExperienceUpdate,
+  EducationUpdate,
+  CertificationUpdate,
+  ActivityType
+} from "@/types";
+import type { JsonValue, InputJsonValue } from "@prisma/client/runtime/library";
 
 const profile = {
-  async get(userId: string) {
+  async get(userId: string): Promise<Profile | null> {
     return await prisma.profile.findUnique({
       where: { id: userId },
       include: {
@@ -11,7 +23,11 @@ const profile = {
         experiences: true,
         educations: true,
         certifications: true,
-        achievements: true,
+        achievements: {
+          include: {
+            achievement: true,
+          },
+        },
         activities: true,
       },
     });
@@ -19,16 +35,25 @@ const profile = {
 
   async update(
     userId: string,
-    data: Partial<{
-      fullname: string;
-      bio: string;
-      title: string;
-      avatarurl: string;
-    }>
-  ) {
+    data: ProfileUpdate
+  ): Promise<Profile> {
     return await prisma.profile.update({
       where: { id: userId },
       data,
+      include: {
+        resumes: true,
+        skills: true,
+        projects: true,
+        experiences: true,
+        educations: true,
+        certifications: true,
+        achievements: {
+          include: {
+            achievement: true,
+          },
+        },
+        activities: true,
+      },
     });
   },
 };
@@ -51,7 +76,7 @@ const skill = {
     });
   },
 
-  async update(skillId: string, data: Partial<{ name: string; title: string; totalxp: number; level: number }>) {
+  async update(skillId: string, data: SkillUpdate) {
     return await prisma.skill.update({
       where: { id: skillId },
       data,
@@ -67,7 +92,7 @@ const skill = {
 
 // Resume-related database operations
 const resume = {
-  async create(profileId: string, title: string, includedIds?: any) {
+  async create(profileId: string, title: string, includedIds?: InputJsonValue) {
     return await prisma.resume.create({
       data: {
         profileid: profileId,
@@ -89,7 +114,7 @@ const resume = {
     });
   },
 
-  async update(resumeId: string, data: Partial<{ title: string; includedids: any }>) {
+  async update(resumeId: string, data: ResumeUpdate) {
     return await prisma.resume.update({
       where: { id: resumeId },
       data,
@@ -145,13 +170,7 @@ const project = {
 
   async update(
     projectId: string, 
-    data: Partial<{ 
-      title: string; 
-      description: string; 
-      link: string; 
-      startdate: Date; 
-      enddate: Date 
-    }>
+    data: ProjectUpdate
   ) {
     return await prisma.project.update({
       where: { id: projectId },
@@ -226,13 +245,7 @@ const experience = {
 
   async update(
     experienceId: string,
-    data: Partial<{
-      role: string;
-      company: string;
-      summary: string;
-      startdate: Date;
-      enddate: Date;
-    }>
+    data: ExperienceUpdate
   ) {
     return await prisma.experience.update({
       where: { id: experienceId },
@@ -299,12 +312,7 @@ const education = {
 
   async update(
     educationId: string,
-    data: Partial<{
-      institution: string;
-      degree: string;
-      startdate: Date;
-      enddate: Date;
-    }>
+    data: EducationUpdate
   ) {
     return await prisma.education.update({
       where: { id: educationId },
@@ -355,13 +363,7 @@ const certification = {
 
   async update(
     certificationId: string,
-    data: Partial<{
-      title: string;
-      issuer: string;
-      issuedate: Date;
-      expirationdate: Date;
-      link: string;
-    }>
+    data: CertificationUpdate
   ) {
     return await prisma.certification.update({
       where: { id: certificationId },
@@ -451,7 +453,7 @@ const achievement = {
 
 // Activity-related database operations
 const activity = {
-  async create(profileId: string, type: 'SKILL' | 'PROJECT' | 'EXPERIENCE' | 'EDUCATION' | 'CERTIFICATION' | 'ACHIEVEMENT', details: string) {
+  async create(profileId: string, type: ActivityType, details: string) {
     return await prisma.activity.create({
       data: {
         profileid: profileId,
@@ -470,7 +472,7 @@ const activity = {
     });
   },
 
-  async getByType(profileId: string, type: 'SKILL' | 'PROJECT' | 'EXPERIENCE' | 'EDUCATION' | 'CERTIFICATION' | 'ACHIEVEMENT') {
+  async getByType(profileId: string, type: ActivityType) {
     return await prisma.activity.findMany({
       where: { 
         profileid: profileId,

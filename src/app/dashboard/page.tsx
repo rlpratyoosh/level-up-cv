@@ -1,22 +1,22 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
+import type { Profile } from "@/types";
 
 export default function DashboardPage() {
 
   const {user, loading, signOut} = useAuth("/login");
+  
 
   const onClick = async () => {
     await signOut();
   };
 
   if(user) return (
-    <>
-        <h1>Dashboard</h1>
-        <p>Welcome, {user.email}!</p>
-        <button onClick={onClick} className="bg-red-500 text-white p-2 rounded">
-          Sign Out
-        </button>
-    </>
+    <div className="flex flex-col items-center justify-center h-screen">
+        <div className="p-4 flex gap-4">
+
+        </div>
+    </div>
   )
 
   if(loading) return <p>Loading...</p>;
