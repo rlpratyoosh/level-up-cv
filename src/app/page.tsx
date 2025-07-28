@@ -9,6 +9,7 @@ import { FaCode } from "react-icons/fa6";
 import { FiDownload } from "react-icons/fi";
 import { IoIosGitBranch } from "react-icons/io";
 import { motion } from "framer-motion";
+import LoginDialog from "@/components/Login";
 
 export default function Home() {
   const cards = [
@@ -249,7 +250,7 @@ export default function Home() {
             <motion.hr 
               className="border-2 border-lime-400 h-full bg-lime-400 rounded-full" 
               initial={{ width: 0 }}
-              animate={{ width: "70%" }}
+              animate={{ width: "75%" }}
               transition={{ duration: 1.5, delay: 1.5, ease: "easeOut" }}
             />
           </div>
@@ -286,18 +287,7 @@ export default function Home() {
               <IoMdArrowForward />
             </motion.div>
           </motion.button>
-          <motion.button 
-            className="flex gap-2 items-center justify-center text-xl border-3 border-blue-500 pt-2 pb-2 pl-6 pr-6 rounded-xl cursor-pointer text-blue-400 font-bold"
-            whileHover={{ 
-              scale: 1.05,
-              backgroundColor: "rgba(59,130,246,0.1)",
-              y: -2
-            }}
-            whileTap={{ scale: 0.99 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
-            Login
-          </motion.button>
+          <LoginDialog />
         </motion.div>
 
         {/* Stats */}
