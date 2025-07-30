@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const publicRoutes = ["/", "/login", "/signup"];
+  const publicRoutes = ["/", "/login", "/signup", "/confirmemail"];
 
   console.log(user);
   
@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (user && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/signup')) {
+  if (user && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/signup' || req.nextUrl.pathname === '/confirmemail')) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
