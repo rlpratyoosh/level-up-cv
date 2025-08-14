@@ -13,7 +13,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useState, useEffect } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 
 import { MdOutlineMail } from "react-icons/md";
@@ -35,26 +34,25 @@ export default function LoginDialog() {
   const [user, setUser] = useState<any>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   
-  const supabase = createClientComponentClient();
   const router = useRouter();
 
   // Check authentication status on mount
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setCheckingAuth(false);
-    };
+  // useEffect(() => {
+  //   const checkUser = async () => {
+  //     const { data: { user } } = await supabase.auth.getUser();
+  //     setUser(user);
+  //     setCheckingAuth(false);
+  //   };
     
-    checkUser();
+  //   checkUser();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+  //   // Listen for auth changes
+  //   const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+  //     setUser(session?.user ?? null);
+  //   });
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  //   return () => subscription.unsubscribe();
+  // }, [supabase.auth]);
 
   // Handle dialog trigger click
   const handleDialogTriggerClick = () => {
@@ -69,13 +67,13 @@ export default function LoginDialog() {
   };
 
   // Handle sign out
-  const handleSignOut = async () => {
-    setLoading(true);
-    await supabase.auth.signOut();
-    setUser(null);
-    setLoading(false);
-    // Keep dialog open to allow new login
-  };
+  // const handleSignOut = async () => {
+  //   setLoading(true);
+  //   await supabase.auth.signOut();
+  //   setUser(null);
+  //   setLoading(false);
+  //   // Keep dialog open to allow new login
+  // };
 
   const {
     register,
@@ -85,24 +83,24 @@ export default function LoginDialog() {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = async (data: FormData) => {
-    setLoading(true);
-    setError(null);
+  // const onSubmit = async (data: FormData) => {
+  //   setLoading(true);
+  //   setError(null);
     
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password,
-    });
+  //   const { error } = await supabase.auth.signInWithPassword({
+  //     email: data.email,
+  //     password,
+  //   });
     
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      // Login successful, redirect to dashboard
-      setIsOpen(false);
-      router.push('/dashboard');
-    }
-  };
+  //   if (error) {
+  //     setError(error.message);
+  //     setLoading(false);
+  //   } else {
+  //     // Login successful, redirect to dashboard
+  //     setIsOpen(false);
+  //     router.push('/dashboard');
+  //   }
+  // };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -307,7 +305,7 @@ export default function LoginDialog() {
                   </motion.button>
                   
                   <motion.button
-                    onClick={handleSignOut}
+                    // onClick={handleSignOut}
                     className="w-full bg-gray-50 hover:bg-gray-100 pt-4 pb-4 pr-6 pl-6 rounded-xl text-gray-700 font-bold transition-all duration-200 flex items-center justify-center gap-2 border-2 border-gray-200 hover:border-gray-300"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ 
@@ -328,7 +326,7 @@ export default function LoginDialog() {
               ) : (
                 /* Login form for non-authenticated users */
                 <motion.form
-                  onSubmit={handleSubmit(onSubmit)}
+                  // onSubmit={handleSubmit(onSubmit)}
                   className="flex flex-col gap-6 items-start justify-center relative z-10"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}

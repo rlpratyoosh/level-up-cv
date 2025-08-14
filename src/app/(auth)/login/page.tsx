@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 
 import { z } from "zod";
@@ -43,25 +42,24 @@ export default function LoginPage() {
     setParticles(particlePositions);
   }, []);
 
-  const onSubmit = async (data: FormData) => {
-    setLoading(true);
-    setError(null);
-    const supabase = createClientComponentClient();
+  // const onSubmit = async (data: FormData) => {
+  //   setLoading(true);
+  //   setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password,
-    });
+  //   const { error } = await supabase.auth.signInWithPassword({
+  //     email: data.email,
+  //     password,
+  //   });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    } else {
-      setLoading(false);
-      router.push("/dashboard");
-    }
-  };
+  //   if (error) {
+  //     setError(error.message);
+  //     setLoading(false);
+  //     return;
+  //   } else {
+  //     setLoading(false);
+  //     router.push("/dashboard");
+  //   }
+  // };
 
   return (
     <div className="relative overflow-hidden">
@@ -137,7 +135,7 @@ export default function LoginPage() {
           Continue your quest to level up your career
         </motion.p>
         <motion.form 
-          onSubmit={handleSubmit(onSubmit)} 
+          // onSubmit={handleSubmit(onSubmit)} 
           className="flex flex-col gap-4 w-full max-w-md"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

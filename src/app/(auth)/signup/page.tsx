@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 
 import { z } from "zod";
@@ -48,26 +47,26 @@ export default function SignupPage() {
     setParticles(particlePositions);
   }, []);
 
-  const onSubmit = async (data: FormData) => {
-    setLoading(true);
-    setError(null);
-    const supabase = createClientComponentClient();
+  // const onSubmit = async (data: FormData) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   const supabase = createClientComponentClient();
 
-    const { error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: { 
-        data: { full_name: data.fullName } 
-      }
-    });
+  //   const { error } = await supabase.auth.signUp({
+  //     email: data.email,
+  //     password: data.password,
+  //     options: { 
+  //       data: { full_name: data.fullName } 
+  //     }
+  //   });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      router.push("/confirmemail");
-    }
-    setLoading(false);
-  };
+  //   if (error) {
+  //     setError(error.message);
+  //   } else {
+  //     router.push("/confirmemail");
+  //   }
+  //   setLoading(false);
+  // };
 
   return (
     <div className="relative overflow-hidden">
@@ -143,7 +142,7 @@ export default function SignupPage() {
           Start your journey and level up your career
         </motion.p>
         <motion.form 
-          onSubmit={handleSubmit(onSubmit)} 
+          // onSubmit={handleSubmit(onSubmit)} 
           className="flex flex-col gap-4 w-full max-w-md"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

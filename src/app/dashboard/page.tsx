@@ -8,9 +8,11 @@ import { CiTrophy } from "react-icons/ci";
 import { PiLightningBold } from "react-icons/pi";
 
 export default function DashboardPage() {
-  const { user, loading, signOut } = useAuth("/login");
+  // const { user, loading, signOut } = useAuth("/login");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const user = {id: "23",}
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -26,9 +28,9 @@ export default function DashboardPage() {
     fetchProfile();
   }, [user]);
 
-  const onClick = async () => {
-    await signOut();
-  };
+  // const onClick = async () => {
+  //   await signOut();
+  // };
 
   if (user)
     return (
@@ -86,7 +88,7 @@ export default function DashboardPage() {
       </div>
     );
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   return (
     <div>
