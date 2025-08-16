@@ -1,36 +1,26 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter } from 'next/navigation'
-import type { User } from '@supabase/supabase-js'
+"use client";
+import { findFullDetail } from "@/lib/action";
+import { User } from "@/types";
+import { signOut, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
-export function useAuth(redirectTo?: string) {
-  const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+export function useAuth() {
+    const { data: session, status } = useSession();
+    const [userDetails, setUserDetails] = useState<User | null>(null);
+    const loading = status === "loading";
+    const user = session?.user || null;
 
-  const supabase = createClientComponentClient()
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            if (user && user.id) {
+                const details = await findFullDetail(user.id as string);
+                setUserDetails(details);
+            }
+        };
+        fetchUserDetails();
+    }, [user]);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user)
-      setLoading(false)
-      if (!data.user && redirectTo) router.push(redirectTo)
-    })
+    const signUserOut = () => signOut({ callbackUrl: "/login" });
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      if (!session?.user && redirectTo) router.push(redirectTo)
-    })
-
-    return () => subscription.subscription.unsubscribe()
-  }, [redirectTo, router])
-
-  const signOut = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-    router.push('/login')
-  }
-
-  return { user, loading, signOut }
+    return { user: userDetails, loading, signUserOut };
 }

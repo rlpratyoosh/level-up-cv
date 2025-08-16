@@ -1,13 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { motion, AnimatePresence } from "framer-motion";
-
 import { FaArrowLeftLong } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,18 +12,10 @@ import { MdOutlineMail } from "react-icons/md";
 import { CiLock, CiUser } from "react-icons/ci";
 import { AiOutlineThunderbolt } from "react-icons/ai";
 import samuraiImage from '@/assets/cute-samurai.png'
+import { signUp } from "@/lib/action";
+import { signUpSchema } from "@/lib/zod";
 
-const formSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  email: z.string().email("Invalid Email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Please confirm your password"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof signUpSchema>;
 
 export default function SignupPage() {
   const router = useRouter();
@@ -35,7 +24,7 @@ export default function SignupPage() {
   const [particles, setParticles] = useState<Array<{left: string, top: string}>>([]);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(signUpSchema),
   });
 
   useEffect(() => {
@@ -47,26 +36,22 @@ export default function SignupPage() {
     setParticles(particlePositions);
   }, []);
 
-  // const onSubmit = async (data: FormData) => {
-  //   setLoading(true);
-  //   setError(null);
-  //   const supabase = createClientComponentClient();
-
-  //   const { error } = await supabase.auth.signUp({
-  //     email: data.email,
-  //     password: data.password,
-  //     options: { 
-  //       data: { full_name: data.fullName } 
-  //     }
-  //   });
-
-  //   if (error) {
-  //     setError(error.message);
-  //   } else {
-  //     router.push("/confirmemail");
-  //   }
-  //   setLoading(false);
-  // };
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await signUp(data);
+      router.push("/confirm");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="relative overflow-hidden">
@@ -142,7 +127,7 @@ export default function SignupPage() {
           Start your journey and level up your career
         </motion.p>
         <motion.form 
-          // onSubmit={handleSubmit(onSubmit)} 
+          onSubmit={handleSubmit(onSubmit)} 
           className="flex flex-col gap-4 w-full max-w-md"
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -161,16 +146,16 @@ export default function SignupPage() {
               transition={{ duration: 0.2 }}
             >
               <CiUser className="text-purple-500 text-xl" />
-              Full Name
+              Username
             </motion.div>
             <motion.input
             type="text"
-            placeholder="Full Name"
-            {...register("fullName")}
+            placeholder="Username"
+            {...register("userName")}
             className="pt-2 pb-2 pl-4 pr-4  w-full rounded-sm text-sm border-2 border-purple-500 outline-0 focus:outline-2 outline-purple-500 transition-all duration-200 hover:shadow-md focus:shadow-lg"
             whileFocus={{ scale: 1.02 }}
           />
-          {errors.fullName && <p className="text-red-600 text-sm">{errors.fullName.message}</p>}
+          {errors.userName && <p className="text-red-600 text-sm">{errors.userName.message}</p>}
           </motion.label>
 
           <motion.label 
