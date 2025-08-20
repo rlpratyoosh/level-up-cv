@@ -10,7 +10,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
   });
 
   await transporter.sendMail({
-    from: `"Hack Pack" <noreply@hackpack.com>`,
+    from: `"Level-Up-CV" <noreply@hackpack.com>`,
     to,
     subject,
     html,
