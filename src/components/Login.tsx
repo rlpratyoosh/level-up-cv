@@ -209,10 +209,10 @@ export default function LoginDialog() {
                                     transition={{ delay: 0.3, duration: 0.4 }}
                                 >
                                     <motion.div
-                                        className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 border border-blue-400/20 rounded-2xl shadow-lg"
+                                        className="w-full px-6 py-4 border border-blue-400/20 rounded-2xl shadow-lg"
                                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        transition={{ delay: 0.4, duration: 0.3 }}
+                                        transition={{  duration: 0.3 }}
                                         whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(59, 130, 246, 0.2)" }}
                                     >
                                         <div className="flex items-center gap-4">
@@ -220,12 +220,11 @@ export default function LoginDialog() {
                                                 initial={{ scale: 0, rotate: -180 }}
                                                 animate={{ scale: 1, rotate: 0 }}
                                                 transition={{
-                                                    delay: 0.5,
                                                     duration: 0.5,
                                                     type: "spring",
                                                     stiffness: 200,
                                                 }}
-                                                className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-blue-500 font-bold text-xl shadow-lg"
+                                                className="w-14 h-14 bg-card rounded-full flex items-center justify-center text-blue-500 font-bold text-xl shadow-lg"
                                                 whileHover={{ rotate: 360 }}
                                             >
                                                 {user.userName?.charAt(0).toUpperCase()}
@@ -263,7 +262,6 @@ export default function LoginDialog() {
                                         whileHover={{
                                             scale: 1.02,
                                             boxShadow: "0 10px 30px rgba(59, 130, 246, 0.3)",
-                                            y: -2,
                                         }}
                                         whileTap={{ scale: 0.98 }}
                                         disabled={processing}
@@ -279,7 +277,7 @@ export default function LoginDialog() {
 
                                     <motion.button
                                         onClick={handleSignOut}
-                                        className="w-full bg-gray-50 hover:bg-gray-100 pt-4 pb-4 pr-6 pl-6 rounded-xl text-gray-700 font-bold transition-all duration-200 flex items-center justify-center gap-2 border-2 border-gray-200 hover:border-gray-300"
+                                        className="w-full border pt-4 pb-4 pr-6 pl-6 rounded-xl text-primary font-bold transition-all duration-200 flex items-center justify-center gap-2 "
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{
                                             opacity: 1,
@@ -288,7 +286,6 @@ export default function LoginDialog() {
                                         }}
                                         whileHover={{
                                             scale: 1.02,
-                                            y: -1,
                                         }}
                                         whileTap={{ scale: 0.98 }}
                                         disabled={processing}

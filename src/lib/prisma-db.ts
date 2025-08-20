@@ -1,3 +1,4 @@
+import { includes } from "zod";
 import { prisma } from "./prisma";
 
 export const db = {
@@ -23,6 +24,14 @@ export const db = {
         create: async (data: {token: string; userId: string, expires: Date}) => prisma.verificationToken.create({ data }),
         findUnique: async (where: { token: string }) => prisma.verificationToken.findUnique({ where }),
         delete: async (where: { id: string }) => prisma.verificationToken.delete({ where })
-    }
+    },
+    profile: {
+        create: async(data: { userId: string, fullName?: string }) => prisma.profile.create({ data }),
+        findUnique: async (where: { userId: string }) => prisma.profile.findUnique({ where, include: { achievements: true, skills: true, projects: true, experiences: true, certifications: true } }),
+    },
+    achievements: {
+        findAll: async () => prisma.achievement.findMany()
+    },
+    
 };
 

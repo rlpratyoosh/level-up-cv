@@ -6,6 +6,7 @@ import { AuthError } from "next-auth";
 import { sendEmail } from "./email";
 import { db } from "./prisma-db";
 import { createUserSchema, signInSchema } from "./zod";
+import { revalidatePath } from "next/cache";
 
 export async function signInUser(data: { email: string; password: string }) {
     const validation = signInSchema.safeParse(data);
@@ -33,6 +34,8 @@ export async function signInUser(data: { email: string; password: string }) {
         }
 
         return { error: "Something went wrong" };
+    } finally {
+        revalidatePath("/dashboard");
     }
 }
 
@@ -71,6 +74,11 @@ export async function signUp(data: { userName: string; email: string; password: 
         userId: user.id,
     });
 
+    await db.profile.create({
+        userId: user.id,
+        fullName: userName
+    });
+
     await sendEmail(
         user.email,
         "Verify your email",
@@ -97,8 +105,21 @@ export async function verifyEmail(token: string) {
 
 export const findFullDetail = async (userId: string) => {
     const user = await db.user.findUnique({ id: userId });
-
-    if (!user) throw new Error("User not found");
-
+    if (!user) {
+        throw new Error("User not found");
+    }
     return user;
 };
+
+export async function findProfile(userId: string) {
+    const profile = await db.profile.findUnique( { userId } );
+    if (!profile) {
+        throw new Error("Profile not found");
+    }
+    return profile;
+}
+
+export async function getAllAchievements() {
+    const achievements = await db.achievements.findAll();
+    return achievements;
+}

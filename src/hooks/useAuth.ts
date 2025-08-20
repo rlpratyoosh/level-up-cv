@@ -1,6 +1,6 @@
 "use client";
 import { findFullDetail } from "@/lib/action";
-import { User } from "@/types";
+import { User } from "@/generated/prisma";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -10,17 +10,26 @@ export function useAuth() {
     const loading = status === "loading";
     const user = session?.user || null;
 
+    const signUserOut = () => signOut({ callbackUrl: "/login" });
+
     useEffect(() => {
-        const fetchUserDetails = async () => {
-            if (user && user.id) {
-                const details = await findFullDetail(user.id as string);
-                setUserDetails(details);
+      const fetchUserDetails = async () => {
+        if (user && user.id) {
+          try {
+            const details = await findFullDetail(user.id as string);
+            setUserDetails(details);
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("User not found")) {
+              signUserOut();
             }
-        };
-        fetchUserDetails();
+            console.error("Error fetching user details:", error);
+          }
+        }
+      };
+      fetchUserDetails();
     }, [user]);
 
-    const signUserOut = () => signOut({ callbackUrl: "/login" });
+    
 
     return { user: userDetails, loading, signUserOut };
 }
