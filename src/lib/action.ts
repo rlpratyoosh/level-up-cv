@@ -3,10 +3,10 @@ import { signIn } from "@/auth";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { AuthError } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { sendEmail } from "./email";
 import { db } from "./prisma-db";
 import { createUserSchema, signInSchema } from "./zod";
-import { revalidatePath } from "next/cache";
 
 export async function signInUser(data: { email: string; password: string }) {
     const validation = signInSchema.safeParse(data);
@@ -76,7 +76,7 @@ export async function signUp(data: { userName: string; email: string; password: 
 
     await db.profile.create({
         userId: user.id,
-        fullName: userName
+        fullName: userName,
     });
 
     await sendEmail(
@@ -112,7 +112,7 @@ export const findFullDetail = async (userId: string) => {
 };
 
 export async function findProfile(userId: string) {
-    const profile = await db.profile.findUnique( { userId } );
+    const profile = await db.profile.findUnique({ userId });
     if (!profile) {
         throw new Error("Profile not found");
     }
@@ -122,4 +122,64 @@ export async function findProfile(userId: string) {
 export async function getAllAchievements() {
     const achievements = await db.achievements.findAll();
     return achievements;
+}
+
+export async function addSkill(profileId: string, skillName: string) {
+    const skillExists = await db.skills.findWithName({ profileId, name: skillName });
+
+    if (skillExists) {
+        throw new Error("Skill already exists");
+    }
+
+    const profile = await db.profile.findUniqueWithProfileId({ id: profileId });
+
+    if (!profile) {
+        throw new Error("Profile not found");
+    }
+
+    profile.currentXpInLevel += 40;
+    profile.totalXp += 40;
+
+    const requiredXp = profile.level * 50;
+
+    if (profile.currentXpInLevel >= requiredXp) {
+        profile.level++;
+        profile.currentXpInLevel = profile.currentXpInLevel - requiredXp;
+        profile.hasLevelledUp = true;
+    }
+
+    await db.profile.update(
+        { id: profileId },
+        {
+            currentXpInLevel: profile.currentXpInLevel,
+            totalXp: profile.totalXp,
+            level: profile.level,
+            hasLevelledUp: profile.hasLevelledUp,
+        }
+    );
+
+    const skill = await db.skills.create({
+        profileId,
+        name: skillName,
+    });
+    revalidatePath("/dashboard");
+    return skill;
+}
+
+
+export async function changeLevelUpState(profileId: string, hasLevelledUp: boolean) {
+    const profile = await db.profile.findUniqueWithProfileId({ id: profileId });
+
+    if (!profile) {
+        throw new Error("Profile not found");
+    }
+
+    await db.profile.update(
+        { id: profileId },
+        { hasLevelledUp }
+    );
+
+    console.log("Level up state changed:", hasLevelledUp);
+
+    revalidatePath("/dashboard");
 }

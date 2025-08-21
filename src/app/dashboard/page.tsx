@@ -1,13 +1,15 @@
 "use client";
 import pfp from "@/assets/pfp.png";
+import SkillDialog from "@/components/Skill";
 import type { Achievement, Profile } from "@/generated/prisma";
 import { useAuth } from "@/hooks/useAuth";
 import { achievementIcons } from "@/lib/achievementIcons";
-import { findProfile, getAllAchievements } from "@/lib/action";
+import { findProfile, getAllAchievements, changeLevelUpState } from "@/lib/action";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CiTrophy } from "react-icons/ci";
 import { PiLightningBold } from "react-icons/pi";
+import { useRouter } from "next/navigation";
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
@@ -69,25 +71,27 @@ export default function DashboardPage() {
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [profileFetched, setProfileFetched] = useState(false);
     const [achievementsFetched, setAchievementsFetched] = useState(false);
-    // Background animation state (mirroring landing page background)
+
     const [particles, setParticles] = useState<Array<{ left: string; top: string }>>([]);
     const [isClient, setIsClient] = useState(false);
+    const [showLevelUp, setShowLevelUp] = useState(false);
+    const levelUpHandledRef = useRef(false);
+
+    const fetchProfile = async () => {
+        if (!user) return;
+        try {
+            const profileData = await findProfile(user.id);
+            setProfile(profileData);
+        } catch (error) {
+            if (error instanceof Error) setError(error.message);
+        } finally {
+            setProfileFetched(true);
+        }
+    };
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            if (!user) return;
-            try {
-                const profileData = await findProfile(user.id);
-                setProfile(profileData);
-            } catch (error) {
-                if (error instanceof Error) setError(error.message);
-            } finally {
-                setProfileFetched(true);
-            }
-        };
         fetchProfile();
     }, [user]);
-
 
     useEffect(() => {
         const fetchAchievements = async () => {
@@ -103,7 +107,6 @@ export default function DashboardPage() {
         fetchAchievements();
     }, []);
 
-    // Initialize animated background particles (same logic as landing page)
     useEffect(() => {
         setIsClient(true);
         const newParticles = [...Array(15)].map(() => ({
@@ -192,6 +195,7 @@ export default function DashboardPage() {
                 </div>
                 {/* Foreground content */}
                 <div className="relative z-10 w-full flex flex-col items-center">
+                    
                     {/* Profile Information */}
                     <div className="p-7 flex gap-4 w-98/100  rounded-2xl mt-5 items-center justify-start  ">
                         {profileLoading ? (
@@ -242,7 +246,7 @@ export default function DashboardPage() {
                                     <div className="h-4 w-20 bg-gray-700 rounded-md animate-pulse" />
                                 ) : (
                                     <span className="text-sm opacity-80">
-                                        {profile && profile?.currentXpInLevel} / {profile && profile?.level * 50 } XP
+                                        {profile && profile?.currentXpInLevel} / {profile && profile?.level * 50} XP
                                     </span>
                                 )}
                             </div>
@@ -255,7 +259,9 @@ export default function DashboardPage() {
                                     <div
                                         className="h-full bg-lime-400 rounded-full transition-all duration-300"
                                         style={{
-                                            width: `${profile && ((profile?.currentXpInLevel / (profile?.level * 50)) * 100)}%`
+                                            width: `${
+                                                profile && (profile?.currentXpInLevel / (profile?.level * 50)) * 100
+                                            }%`,
                                         }}
                                     />
                                 )}
@@ -264,7 +270,9 @@ export default function DashboardPage() {
                                 {profileLoading ? (
                                     <div className="h-4 w-36 bg-gray-700 rounded-md animate-pulse" />
                                 ) : (
-                                    <>{profile && ( (profile?.level * 50) - profile?.currentXpInLevel)} XP until next level</>
+                                    <>
+                                        {profile && profile?.level * 50 - profile?.currentXpInLevel} XP until next level
+                                    </>
                                 )}
                             </div>
                         </div>
@@ -336,9 +344,13 @@ export default function DashboardPage() {
                                 <PiLightningBold className="text-3xl text-lime-300" /> Skills
                             </div>
                             <div className="flex items-center justify-center gap-2">
-                                <button className="ml-2 px-3 py-1 text-sm bg-lime-800/60 hover:bg-lime-700/80 text-lime-300 rounded-lg flex items-center cursor-pointer">
-                                    <span className="mr-1">+</span> Skill
-                                </button>
+                                <SkillDialog
+                                    profileId={profile?.id as string}
+                                    onAdded={async () => {
+                                        setProfileFetched(false); // show loading placeholders briefly
+                                        await fetchProfile();
+                                    }}
+                                />
                                 <span>{profileLoading ? "--" : profile?.skills.length || 0}</span>
                             </div>
                         </div>
@@ -366,9 +378,9 @@ export default function DashboardPage() {
                                 ) : (
                                     <>
                                         {profile?.skills.map(skill => {
-                                            const xpForNextLevel = (skill.level + 1) * 100;
+                                            const xpForNextLevel = skill.level * 100;
                                             const currentXp = skill.totalXp;
-                                            const xpProgress = currentXp - skill.level * 100;
+                                            const xpProgress = currentXp - (skill.level - 1) * 100;
                                             const progressPercent = Math.min((xpProgress / 100) * 100, 100);
                                             const xpRemaining = xpForNextLevel - currentXp;
                                             return (
