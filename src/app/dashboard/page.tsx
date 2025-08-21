@@ -4,14 +4,17 @@ import SkillDialog from "@/components/Skill";
 import type { Achievement, Profile } from "@/generated/prisma";
 import { useAuth } from "@/hooks/useAuth";
 import { achievementIcons } from "@/lib/achievementIcons";
-import { findProfile, getAllAchievements, changeLevelUpState } from "@/lib/action";
+import { changeLevelUpState, findProfile, getAllAchievements } from "@/lib/action";
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import { CiTrophy } from "react-icons/ci";
 import { PiLightningBold } from "react-icons/pi";
-import { useRouter } from "next/navigation";
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+
+const ReactConfetti = dynamic(() => import("react-confetti"), { ssr: false });
 
 type ProfileDetails = {
     skills: {
@@ -75,6 +78,7 @@ export default function DashboardPage() {
     const [particles, setParticles] = useState<Array<{ left: string; top: string }>>([]);
     const [isClient, setIsClient] = useState(false);
     const [showLevelUp, setShowLevelUp] = useState(false);
+    const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
     const levelUpHandledRef = useRef(false);
 
     const fetchProfile = async () => {
@@ -82,6 +86,12 @@ export default function DashboardPage() {
         try {
             const profileData = await findProfile(user.id);
             setProfile(profileData);
+
+            // Check if the user has leveled up
+            if (profileData.hasLevelledUp && !levelUpHandledRef.current) {
+                setShowLevelUp(true);
+                levelUpHandledRef.current = true;
+            }
         } catch (error) {
             if (error instanceof Error) setError(error.message);
         } finally {
@@ -114,7 +124,39 @@ export default function DashboardPage() {
             top: `${Math.random() * 100}%`,
         }));
         setParticles(newParticles);
+
+        // Update window size for confetti
+        const updateWindowSize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        updateWindowSize();
+        window.addEventListener("resize", updateWindowSize);
+
+        return () => window.removeEventListener("resize", updateWindowSize);
     }, []);
+
+    // Handle level up notification and reset state
+    useEffect(() => {
+        if (profile?.hasLevelledUp) {
+            setShowLevelUp(true);
+
+            // Reset hasLevelledUp to false after 5 seconds
+            const timer = setTimeout(async () => {
+                if (profile?.id) {
+                    try {
+                        await changeLevelUpState(profile.id, false);
+                        setShowLevelUp(false);
+                        levelUpHandledRef.current = false;
+                    } catch (error) {
+                        console.error("Failed to reset level up state:", error);
+                    }
+                }
+            }, 5000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [profile?.hasLevelledUp, profile?.id]);
 
     if (loading) {
         return <p>Loading...</p>;
@@ -126,6 +168,59 @@ export default function DashboardPage() {
     if (user) {
         return (
             <div className="flex flex-col items-center justify-start min-h-screen relative overflow-hidden">
+                {/* Confetti Effect when level up */}
+                {showLevelUp && isClient && (
+                    <ReactConfetti
+                        width={windowSize.width}
+                        height={windowSize.height}
+                        recycle={false}
+                        numberOfPieces={200}
+                        gravity={0.25}
+                        colors={["#a3e635", "#fbbf24", "#60a5fa", "#c084fc"]}
+                    />
+                )}
+
+                {/* Level Up Notification */}
+                <Dialog open={showLevelUp} onOpenChange={setShowLevelUp}>
+                    <DialogContent className="border border-[var(--border)] bg-card backdrop-blur-md shadow-xl shadow-amber-500/20">
+                        <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            className="p-6 flex flex-col items-center justify-center"
+                        >
+                            <motion.div
+                                initial={{ scale: 1 }}
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ duration: 1, repeat: Infinity, repeatType: "reverse" }}
+                                className="text-5xl text-amber-300 mb-4"
+                            >
+                                <CiTrophy />
+                            </motion.div>
+                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 mb-2">
+                                Level Up!
+                            </h2>
+                            <p className="text-center text-gray-300 mb-4">
+                                Congratulations! You've reached level {profile?.level}!
+                            </p>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => {
+                                    setShowLevelUp(false);
+                                    if (profile?.id) {
+                                        changeLevelUpState(profile.id, false);
+                                        levelUpHandledRef.current = false;
+                                    }
+                                }}
+                                className="px-4 py-2 bg-amber-500 text-black font-medium rounded-lg"
+                            >
+                                Awesome!
+                            </motion.button>
+                        </motion.div>
+                    </DialogContent>
+                </Dialog>
+
                 {/* Animated Background (replicated from landing page) */}
                 <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
                     {/* Gradient orbs */}
@@ -195,7 +290,6 @@ export default function DashboardPage() {
                 </div>
                 {/* Foreground content */}
                 <div className="relative z-10 w-full flex flex-col items-center">
-                    
                     {/* Profile Information */}
                     <div className="p-7 flex gap-4 w-98/100  rounded-2xl mt-5 items-center justify-start  ">
                         {profileLoading ? (
@@ -348,7 +442,8 @@ export default function DashboardPage() {
                                     profileId={profile?.id as string}
                                     onAdded={async () => {
                                         setProfileFetched(false); // show loading placeholders briefly
-                                        await fetchProfile();
+                                        levelUpHandledRef.current = false; // Reset the ref to allow new level up notifications
+                                        await fetchProfile(); // This will check for hasLevelledUp
                                     }}
                                 />
                                 <span>{profileLoading ? "--" : profile?.skills.length || 0}</span>
