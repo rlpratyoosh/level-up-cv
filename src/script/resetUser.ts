@@ -29,6 +29,10 @@ const resetUser = async () => {
         where: { profileId: profile.id },
     });
 
+    await prisma.project.deleteMany({
+        where: { profileId: profile.id },
+    });
+
     console.log("User reset successfully");
 };
 

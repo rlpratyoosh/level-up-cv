@@ -42,7 +42,13 @@ export const db = {
             }),
         update: async (
             where: { id: string },
-            data: { fullName?: string; currentXpInLevel?: number; totalXp?: number; level?: number, hasLevelledUp?: boolean }
+            data: {
+                fullName?: string;
+                currentXpInLevel?: number;
+                totalXp?: number;
+                level?: number;
+                hasLevelledUp?: boolean;
+            }
         ) => prisma.profile.update({ where, data }),
     },
     achievements: {
@@ -53,4 +59,18 @@ export const db = {
         findMany: async (where: { profileId: string }) => prisma.skill.findMany({ where }),
         findWithName: async (where: { profileId: string; name: string }) => prisma.skill.findFirst({ where }),
     },
+    projects: {
+        create: async (data: {
+            title: string;
+            description?: string;
+            link?: string;
+            profileId: string;
+            startDate?: Date;
+            endDate?: Date;
+        }) => prisma.project.create({ data }),
+        findMany: async (where: { profileId: string }) => prisma.project.findMany({ where }),
+    },
+    project_skills: {
+        create: async (data: { projectId: string; skillId: string }) => prisma.projectSkills.create({ data }),
+    }
 };

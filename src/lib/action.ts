@@ -166,7 +166,6 @@ export async function addSkill(profileId: string, skillName: string) {
     return skill;
 }
 
-
 export async function changeLevelUpState(profileId: string, hasLevelledUp: boolean) {
     const profile = await db.profile.findUniqueWithProfileId({ id: profileId });
 
@@ -174,12 +173,41 @@ export async function changeLevelUpState(profileId: string, hasLevelledUp: boole
         throw new Error("Profile not found");
     }
 
-    await db.profile.update(
-        { id: profileId },
-        { hasLevelledUp }
-    );
+    await db.profile.update({ id: profileId }, { hasLevelledUp });
 
     console.log("Level up state changed:", hasLevelledUp);
 
     revalidatePath("/dashboard");
+}
+
+export async function getAllSkills(profileId: string) {
+    try {
+        const skills = await db.skills.findMany({ profileId });
+        return skills;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error("Error fetching skills: " + error.message);
+        }
+        throw new Error("Unknown error occurred while fetching skills");
+    }
+}
+
+export async function addProject(
+    profileId: string,
+    title: string,
+    description?: string,
+    link?: string,
+    skillId?: string[],
+    startDate?: string,
+    endDate?: string
+) {
+    skillId?.map(async skill => await db.project_skills.create({ projectId: profileId, skillId: skill }));
+    await db.projects.create({
+        title,
+        description,
+        link,
+        profileId,
+        startDate: startDate ? new Date(startDate) : undefined,
+        endDate: endDate ? new Date(endDate) : undefined,
+    });
 }

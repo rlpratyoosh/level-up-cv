@@ -13,6 +13,7 @@ import { PiLightningBold } from "react-icons/pi";
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import ProjectsDialog from "@/components/Proects";
 
 const ReactConfetti = dynamic(() => import("react-confetti"), { ssr: false });
 
@@ -157,6 +158,12 @@ export default function DashboardPage() {
             return () => clearTimeout(timer);
         }
     }, [profile?.hasLevelledUp, profile?.id]);
+
+    const onAdded = async () => {
+        setProfileFetched(false); // show loading placeholders briefly
+        levelUpHandledRef.current = false; // Reset the ref to allow new level up notifications
+        await fetchProfile(); // This will check for hasLevelledUp
+    };
 
     if (loading) {
         return <p>Loading...</p>;
@@ -438,14 +445,7 @@ export default function DashboardPage() {
                                 <PiLightningBold className="text-3xl text-lime-300" /> Skills
                             </div>
                             <div className="flex items-center justify-center gap-2">
-                                <SkillDialog
-                                    profileId={profile?.id as string}
-                                    onAdded={async () => {
-                                        setProfileFetched(false); // show loading placeholders briefly
-                                        levelUpHandledRef.current = false; // Reset the ref to allow new level up notifications
-                                        await fetchProfile(); // This will check for hasLevelledUp
-                                    }}
-                                />
+                                <SkillDialog profileId={profile?.id as string} onAdded={onAdded} />
                                 <span>{profileLoading ? "--" : profile?.skills.length || 0}</span>
                             </div>
                         </div>
@@ -535,9 +535,7 @@ export default function DashboardPage() {
                             <div className="flex items-center justify-between w-full">
                                 <div className="text-lg font-semibold">Projects</div>
                                 <div className="flex items-center justify-center gap-2">
-                                    <button className="ml-2 px-3 py-1 text-sm bg-indigo-800/60 hover:bg-indigo-700/80 text-indigo-300 rounded-lg flex items-center cursor-pointer">
-                                        <span className="mr-1">+</span> Project
-                                    </button>
+                                    <ProjectsDialog profileId={profile?.id as string} onAdded={onAdded} />
                                     <span>{profile?.projects.length || 0}</span>
                                 </div>
                             </div>
@@ -560,7 +558,7 @@ export default function DashboardPage() {
                                                         View Project
                                                     </a>
                                                 )}
-                                                <div className="text-xs text-gray-400 mt-auto">
+                                                <div className="text-xs text-gray-400 mt-2">
                                                     {project.startDate
                                                         ? new Date(project.startDate).toLocaleDateString()
                                                         : "N/A"}
@@ -695,6 +693,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
                 {/* End outer container */}
+                <div className="mt-10"></div>
             </div>
         );
     }
