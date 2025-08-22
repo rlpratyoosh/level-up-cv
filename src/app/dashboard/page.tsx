@@ -7,7 +7,6 @@ import { changeLevelUpState, findProfile, getAllAchievements, getAllProjects } f
 import { useEffect, useRef, useState } from "react";
 
 // Component imports
-import Achievements from "@/components/Achievements";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Certifications from "@/components/Certifications";
 import Experiences from "@/components/Experiences";
@@ -142,7 +141,27 @@ export default function DashboardPage() {
     };
 
     if (loading) {
-        return <p>Loading...</p>;
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-black">
+                <div className="relative w-24 h-24">
+                    {/* Outer spinning ring */}
+                    <div className="absolute inset-0 rounded-full border-t-2 border-b-2 border-lime-500 animate-spin"></div>
+
+                    {/* Middle spinning ring (opposite direction) */}
+                    <div className="absolute inset-2 rounded-full border-r-2 border-l-2 border-purple-500 animate-[spin_1.5s_linear_infinite_reverse]"></div>
+
+                    {/* Inner spinning ring */}
+                    <div className="absolute inset-4 rounded-full border-t-2 border-b-2 border-cyan-500 animate-[spin_2s_linear_infinite]"></div>
+
+                    {/* Center pulsing circle */}
+                    <div className="absolute inset-7 rounded-full bg-indigo-500/50 animate-pulse"></div>
+                </div>
+
+                <p className="mt-8 text-lg font-medium text-transparent bg-clip-text bg-gradient-to-r from-lime-300 via-purple-300 to-cyan-300 animate-pulse">
+                    Loading your profile...
+                </p>
+            </div>
+        );
     }
 
     const profileLoading = user && !profileFetched;
@@ -166,7 +185,12 @@ export default function DashboardPage() {
                 {/* Foreground content */}
                 <div className="relative z-10 w-full flex flex-col items-center">
                     {/* Profile Header */}
-                    <ProfileHeader profile={profile} profileLoading={profileLoading} experiencesLength={profile?.experiences.length as number} certificationsLength={profile?.certifications.length as number}/>
+                    <ProfileHeader
+                        profile={profile}
+                        profileLoading={profileLoading}
+                        experiencesLength={profile?.experiences.length as number}
+                        certificationsLength={profile?.certifications.length as number}
+                    />
 
                     {/* Skills */}
                     <Skills profile={profile} profileLoading={profileLoading as boolean} onAdded={onAdded} />
@@ -174,13 +198,18 @@ export default function DashboardPage() {
                     {/* Project, Internship and Certifications */}
                     <div className="flex flex-row gap-4 w-98/100 mt-5">
                         {/* Projects */}
-                        <Projects profile={profile} projects={projects} onAdded={onAdded} />
+                        <Projects
+                            profile={profile}
+                            projects={projects}
+                            onAdded={onAdded}
+                            projectsLoading={profileLoading as boolean}
+                        />
 
                         {/* Experiences */}
-                        <Experiences profile={profile} />
+                        <Experiences profile={profile} profileLoading={profileLoading} />
 
                         {/* Certifications */}
-                        <Certifications profile={profile} />
+                        <Certifications profile={profile} profileLoading={profileLoading} />
                     </div>
                 </div>
                 <div className="mt-10"></div>

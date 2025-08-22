@@ -213,6 +213,38 @@ export async function addProject(
     endDate?: string,
     skillId?: string[],
 ) {
+    const projectExists = await db.projects.findWithName({ profileId, title });
+
+    if (projectExists) {
+        throw new Error("Project already exists");
+    }
+
+    const profile = await db.profile.findUniqueWithProfileId({ id: profileId });
+
+    if (!profile) {
+        throw new Error("Profile not found");
+    }
+
+    profile.currentXpInLevel += 80;
+    profile.totalXp += 80;
+
+    const requiredXp = profile.level * 50;
+
+    if (profile.currentXpInLevel >= requiredXp) {
+        profile.level++;
+        profile.currentXpInLevel = profile.currentXpInLevel - requiredXp;
+        profile.hasLevelledUp = true;
+    }
+
+    await db.profile.update(
+        { id: profileId },
+        {
+            currentXpInLevel: profile.currentXpInLevel,
+            totalXp: profile.totalXp,
+            level: profile.level,
+            hasLevelledUp: profile.hasLevelledUp,
+        }
+    );
 
     const project = await db.projects.create({
         title,
@@ -224,4 +256,7 @@ export async function addProject(
     });
 
     skillId?.map(async skill => await db.project_skills.create({ projectId: project.id, skillId: skill }));
+
+    revalidatePath("/dashboard");
+    return project;
 }

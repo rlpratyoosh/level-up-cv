@@ -69,6 +69,7 @@ export const db = {
             endDate?: Date;
         }) => prisma.project.create({ data }),
         findMany: async (where: { profileId: string }) => prisma.project.findMany({ where, include: { skills: true } }),
+        findWithName: async (where: { profileId: string; title: string }) => prisma.project.findFirst({ where }),
     },
     project_skills: {
         create: async (data: { projectId: string; skillId: string }) => prisma.projectSkills.create({ data }),
