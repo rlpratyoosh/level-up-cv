@@ -11,7 +11,6 @@ const projectSchema = z.object({
     title: z.string().min(1, "Project title is required"),
     description: z.string().optional(),
     link: z.string().url("Invalid URL").optional(),
-    skillIds: z.array(z.string()).min(1, "At least one related skill is required"),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
 });
@@ -41,8 +40,6 @@ export default function ProjectsDialog({
         register,
         handleSubmit,
         formState: { errors },
-        setValue,
-        watch,
         reset,
     } = useForm<FormData>({
         resolver: zodResolver(projectSchema),
@@ -50,7 +47,6 @@ export default function ProjectsDialog({
             title: "",
             description: "",
             link: "",
-            skillIds: [],
             startDate: "",
             endDate: "",
         },
@@ -61,7 +57,7 @@ export default function ProjectsDialog({
     const [adding, setAdding] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedSkills, setSelectedSkills] = useState<Skills[]>([]);
+    const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
     // Ref for dropdown to handle click outside
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -87,26 +83,18 @@ export default function ProjectsDialog({
     }, [isOpen, reset]);
 
     // Handle skill selection
-    const handleSkillSelect = (skill: Skills) => {
-        if (!selectedSkills.some(s => s.id === skill.id)) {
-            const newSelectedSkills = [...selectedSkills, skill];
+    const handleSkillSelect = (skillId: string) => {
+        if (!selectedSkills.some(s => s === skillId)) {
+            const newSelectedSkills = [...selectedSkills, skillId];
             setSelectedSkills(newSelectedSkills);
-            setValue(
-                "skillIds",
-                newSelectedSkills.map(s => s.id)
-            );
         }
         setDropdownOpen(false);
     };
 
     // Handle skill removal
     const handleRemoveSkill = (skillId: string) => {
-        const newSelectedSkills = selectedSkills.filter(s => s.id !== skillId);
+        const newSelectedSkills = selectedSkills.filter(s => s !== skillId);
         setSelectedSkills(newSelectedSkills);
-        setValue(
-            "skillIds",
-            newSelectedSkills.map(s => s.id)
-        );
     };
 
     // Handle click outside dropdown
@@ -126,14 +114,15 @@ export default function ProjectsDialog({
     const onSubmit = async (data: FormData) => {
         setAdding(true);
         try {
+            console.log(selectedSkills);
             await addProject(
                 profileId,
                 data.title,
                 data.description,
                 data.link,
-                data.skillIds,
                 data.startDate,
-                data.endDate
+                data.endDate,
+                selectedSkills,
             );
             setIsOpen(false);
             router.refresh();
@@ -285,36 +274,36 @@ export default function ProjectsDialog({
 
                                         {/* Selected skills tags */}
                                         <div className="flex flex-wrap gap-2 mb-2">
-                                            {selectedSkills.map(skill => (
-                                                <div
-                                                    key={skill.id}
-                                                    className="bg-indigo-700/50 text-indigo-200 text-xs py-1 px-2 rounded-md flex items-center gap-1"
-                                                >
-                                                    {skill.name}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveSkill(skill.id)}
-                                                        className="text-indigo-300 hover:text-white ml-1 focus:outline-none"
+                                            {selectedSkills.map(skillId => {
+                                                const skill = skills.find(s => s.id === skillId);
+                                                return skill ? (
+                                                    <div
+                                                        key={skill.id}
+                                                        className="bg-indigo-700/50 text-indigo-200 text-xs py-1 px-2 rounded-md flex items-center gap-1"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-3 w-3"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
+                                                        {skill.name}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveSkill(skill.id)}
+                                                            className="text-indigo-300 hover:text-white ml-1 focus:outline-none"
                                                         >
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                                                clipRule="evenodd"
-                                                            />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            ))}
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                className="h-3 w-3"
+                                                                viewBox="0 0 20 20"
+                                                                fill="currentColor"
+                                                            >
+                                                                <path
+                                                                    fillRule="evenodd"
+                                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                                    clipRule="evenodd"
+                                                                />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                ) : null;
+                                            })}
                                         </div>
-
-                                        {/* Hidden input to store selected skill IDs */}
-                                        <input type="hidden" {...register("skillIds")} />
 
                                         {/* Custom dropdown */}
                                         <div className="relative" ref={dropdownRef}>
@@ -366,13 +355,13 @@ export default function ProjectsDialog({
                                                     {skills.length > 0 ? (
                                                         skills
                                                             .filter(
-                                                                skill => !selectedSkills.some(s => s.id === skill.id)
+                                                                skill => !selectedSkills.some(s => s === skill.id)
                                                             )
                                                             .map(skill => (
                                                                 <div
                                                                     key={skill.id}
                                                                     className="p-2 hover:bg-indigo-800/50 cursor-pointer text-indigo-200"
-                                                                    onClick={() => handleSkillSelect(skill)}
+                                                                    onClick={() => handleSkillSelect(skill.id)}
                                                                 >
                                                                     {skill.name}
                                                                 </div>
@@ -383,14 +372,6 @@ export default function ProjectsDialog({
                                                         </div>
                                                     )}
 
-                                                    {skills.length > 0 &&
-                                                        !skills.filter(
-                                                            skill => !selectedSkills.some(s => s.id === skill.id)
-                                                        ).length && (
-                                                            <div className="p-2 text-indigo-400/60 text-center">
-                                                                All skills selected
-                                                            </div>
-                                                        )}
                                                 </motion.div>
                                             )}
                                         </div>
@@ -398,12 +379,6 @@ export default function ProjectsDialog({
                                         <p className="text-xs text-indigo-400/60 font-medium">
                                             Click on skills to add, click on tags to remove
                                         </p>
-
-                                        {errors.skillIds && (
-                                            <span className="text-red-400 text-xs font-medium tracking-wide">
-                                                {errors.skillIds.message}
-                                            </span>
-                                        )}
                                     </div>
 
                                     <motion.button

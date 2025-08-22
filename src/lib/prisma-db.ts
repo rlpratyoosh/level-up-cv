@@ -34,7 +34,7 @@ export const db = {
         findUnique: async (where: { userId: string }) =>
             prisma.profile.findUnique({
                 where,
-                include: { achievements: true, skills: true, projects: true, experiences: true, certifications: true },
+                include: { achievements: true, skills: true, experiences: true, certifications: true },
             }),
         findUniqueWithProfileId: async (where: { id: string }) =>
             prisma.profile.findUnique({
@@ -68,7 +68,7 @@ export const db = {
             startDate?: Date;
             endDate?: Date;
         }) => prisma.project.create({ data }),
-        findMany: async (where: { profileId: string }) => prisma.project.findMany({ where }),
+        findMany: async (where: { profileId: string }) => prisma.project.findMany({ where, include: { skills: true } }),
     },
     project_skills: {
         create: async (data: { projectId: string; skillId: string }) => prisma.projectSkills.create({ data }),

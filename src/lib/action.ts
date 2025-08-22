@@ -192,17 +192,29 @@ export async function getAllSkills(profileId: string) {
     }
 }
 
+export async function getAllProjects(profileId: string) {
+    try {
+        const projects = await db.projects.findMany({ profileId });
+        return projects;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error("Error fetching projects: " + error.message);
+        }
+        throw new Error("Unknown error occurred while fetching projects");
+    }
+}
+
 export async function addProject(
     profileId: string,
     title: string,
     description?: string,
     link?: string,
-    skillId?: string[],
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    skillId?: string[],
 ) {
-    skillId?.map(async skill => await db.project_skills.create({ projectId: profileId, skillId: skill }));
-    await db.projects.create({
+
+    const project = await db.projects.create({
         title,
         description,
         link,
@@ -210,4 +222,6 @@ export async function addProject(
         startDate: startDate ? new Date(startDate) : undefined,
         endDate: endDate ? new Date(endDate) : undefined,
     });
+
+    skillId?.map(async skill => await db.project_skills.create({ projectId: project.id, skillId: skill }));
 }

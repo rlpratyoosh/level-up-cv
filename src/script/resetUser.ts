@@ -25,6 +25,10 @@ const resetUser = async () => {
         },
     });
 
+    await prisma.projectSkills.deleteMany({
+        where: { project: { profileId: profile.id } },
+    });
+
     await prisma.skill.deleteMany({
         where: { profileId: profile.id },
     });
